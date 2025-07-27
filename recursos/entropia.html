@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entropía Binaria - Visualización</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .chart-container {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .value-card {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .value-card.max-entropy {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-color: #f87171;
+        }
+
+        .value-card.symmetric {
+            background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+            border-color: #38bdf8;
+        }
+
+        .p-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .entropy-value {
+            font-size: 1rem;
+            color: #64748b;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .max-entropy .label {
+            color: #dc2626;
+        }
+
+        .symmetric .label {
+            color: #0369a1;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .info-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .info-list {
+            list-style: none;
+            space-y: 8px;
+        }
+
+        .info-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .info-list li:before {
+            content: "•";
+            color: #6366f1;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .formula {
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Entropía Binaria H(p)</h1>
+            <p>Visualización interactiva de la función de entropía para distribuciones binarias</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="chart-container">
+                <div class="chart-title">Curva de Entropía Binaria</div>
+                <div class="formula">H(p) = -p·log₂(p) - (1-p)·log₂(1-p)</div>
+                <div class="chart-wrapper">
+                    <canvas id="entropyChart"></canvas>
+                </div>
+                <p style="color: #64748b; font-size: 0.9rem; text-align: center;">
+                    Haz hover sobre los puntos para ver los valores exactos
+                </p>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="p-value">p = 0.1</div>
+                    <div class="entropy-value">H(p) = 0.468996 bits</div>
+                </div>
+                
+                <div class="value-card symmetric">
+                    <div class="p-value">p = 0.3</div>
+                    <div class="entropy-value">H(p) = 0.881291 bits</div>
+                    <div class="label">Simétrico</div>
+                </div>
+                
+                <div class="value-card max-entropy">
+                    <div class="p-value">p = 0.5</div>
+                    <div class="entropy-value">H(p) = 1.000000 bits</div>
+                    <div class="label">Máxima Entropía</div>
+                </div>
+                
+                <div class="value-card symmetric">
+                    <div class="p-value">p = 0.7</div>
+                    <div class="entropy-value">H(p) = 0.881291 bits</div>
+                    <div class="label">Simétrico</div>
+                </div>
+                
+                <div class="value-card">
+                    <div class="p-value">p = 0.9</div>
+                    <div class="entropy-value">H(p) = 0.468996 bits</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-title">Propiedades de la Entropía Binaria</div>
+                <ul class="info-list">
+                    <li><span class="highlight">Máximo en p = 0.5:</span> La entropía es máxima cuando ambos eventos son igualmente probables (máxima incertidumbre)</li>
+                    <li><span class="highlight">Simetría:</span> H(p) = H(1-p), la función es simétrica respecto a p = 0.5</li>
+                    <li><span class="highlight">Extremos:</span> H(0) = H(1) = 0, no hay incertidumbre cuando un evento es completamente seguro</li>
+                    <li><span class="highlight">Rango:</span> 0 ≤ H(p) ≤ 1 bit para distribuciones binarias</li>
+                    <li><span class="highlight">Interpretación:</span> Mide la cantidad promedio de información (en bits) necesaria para codificar el resultado</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para calcular entropía binaria
+        function calculateEntropy(p) {
+            if (p === 0 || p === 1) return 0;
+            return -(p * Math.log2(p) + (1 - p) * Math.log2(1 - p));
+        }
+
+        // Generar datos para la curva
+        const curveData = [];
+        const labels = [];
+        for (let i = 0; i <= 100; i++) {
+            const p = i / 100;
+            labels.push(p.toFixed(2));
+            curveData.push(calculateEntropy(p));
+        }
+
+        // Puntos destacados
+        const highlightPoints = [
+            { p: 0.1, entropy: 0.468996 },
+            { p: 0.3, entropy: 0.881291 },
+            { p: 0.5, entropy: 1.000000 },
+            { p: 0.7, entropy: 0.881291 },
+            { p: 0.9, entropy: 0.468996 }
+        ];
+
+        // Configuración del gráfico
+        const ctx = document.getElementById('entropyChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Entropía H(p)',
+                    data: curveData,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#4f46e5'
+                }, {
+                    label: 'Puntos destacados',
+                    data: Array(101).fill(null),
+                    borderColor: '#dc2626',
+                    backgroundColor: '#dc2626',
+                    borderWidth: 0,
+                    pointRadius: highlightPoints.map(function(point, i) { return 6; }),
+                    pointHoverRadius: 8,
+                    showLine: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const p = parseFloat(context.label);
+                                const entropy = context.parsed.y;
+                                return `p = ${p.toFixed(2)}, H(p) = ${entropy.toFixed(6)} bits`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Probabilidad (p)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            callback: function(value, index) {
+                                return index % 10 === 0 ? (index / 100).toFixed(1) : '';
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Entropía H(p) (bits)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        min: 0,
+                        max: 1.1,
+                        ticks: {
+                            stepSize: 0.2
+                        }
+                    }
+                }
+            }
+        });
+
+        // Añadir los puntos destacados
+        highlightPoints.forEach(function(point) {
+            const index = Math.round(point.p * 100);
+            chart.data.datasets[1].data[index] = point.entropy;
+        });
+
+        chart.update();
+
+        // Agregar interactividad a las tarjetas
+        const cards = document.querySelectorAll('.value-card');
+        cards.forEach(function(card, index) {
+            card.addEventListener('click', function() {
+                const point = highlightPoints[index];
+                alert('Punto seleccionado:\np = ' + point.p + '\nH(p) = ' + point.entropy.toFixed(6) + ' bits');
+            });
+        });
+    </script>
+</body>
+</html>
