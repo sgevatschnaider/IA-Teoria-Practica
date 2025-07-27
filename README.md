@@ -290,7 +290,7 @@ Esta sección agrupa notebooks diseñados para enseñar y reforzar conceptos cla
 |---|---|
 | **Introducción a SQL, Inteligencia Artificial y Seguridad** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Este cuaderno explora los fundamentos de SQL y su papel en la gestión de datos, enlazando con conceptos de inteligencia artificial y las principales prácticas de seguridad de la información. Incluye ejemplos prácticos de consultas, integración con IA y recomendaciones clave para proteger datos sensibles.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/IA-Teoria-Practica/blob/ba263d9a578db2aa58aa9993bc76e0c2e5d6de7b/notebooks/Introducci%C3%B3n_a_SQL%2C_Inteligencia_Artificical_y_Seguridad.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/IA-Teoria-Practica/blob/ba263d9a578db2aa58aa9993bc76e0c2e5d6de7b/notebooks/Introducci%C3%B3n_a_SQL%2C_Inteligencia_Artificical_y_Seguridad.ipynb) |
 
-##  Probabilidad y Estadística
+##  📄 Probabilidad y Estadística
 
 | 📄 Recurso | 📥 Acceso |
 | :--- | :--- |
