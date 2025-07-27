@@ -290,6 +290,20 @@ Esta sección agrupa notebooks diseñados para enseñar y reforzar conceptos cla
 |---|---|
 | **Introducción a SQL, Inteligencia Artificial y Seguridad** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Este cuaderno explora los fundamentos de SQL y su papel en la gestión de datos, enlazando con conceptos de inteligencia artificial y las principales prácticas de seguridad de la información. Incluye ejemplos prácticos de consultas, integración con IA y recomendaciones clave para proteger datos sensibles.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/IA-Teoria-Practica/blob/ba263d9a578db2aa58aa9993bc76e0c2e5d6de7b/notebooks/Introducci%C3%B3n_a_SQL%2C_Inteligencia_Artificical_y_Seguridad.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/IA-Teoria-Practica/blob/ba263d9a578db2aa58aa9993bc76e0c2e5d6de7b/notebooks/Introducci%C3%B3n_a_SQL%2C_Inteligencia_Artificical_y_Seguridad.ipynb) |
 
+##  Probabilidad y Estadística
+
+| 📄 Recurso | 📥 Acceso |
+| :--- | :--- |
+| **Notebook: Fundamentos de Probabilidad y Estadística** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Un notebook esencial que cubre los pilares de la probabilidad y la estadística, conceptos indispensables para el Machine Learning. Explora temas como estadística descriptiva (media, varianza), distribuciones de probabilidad y teoremas clave. Este material es crucial para entender cómo se analizan los datos, se evalúan los modelos y se cuantifica la incertidumbre en las predicciones.</p></details> | <a href="https://github.com/sgevatschnaider/machine-learning/blob/a4f6115bbf6382254703d03864ca163415f9edc2/notebooks/es/Probabilidad_y_estadistica_.ipynb" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github" alt="Ver en GitHub"></a> <a href="https://colab.research.google.com/github/sgevatschnaider/machine-learning/blob/main/notebooks/es/Probabilidad_y_estadistica_.ipynb" target="_blank" rel="noopener noreferrer"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+
+
+---
+
+| 📄 Recurso | Enlaces |
+|---|---|
+| **Probabilidad, Estadística y Funciones Hash** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook que repasa nociones clave de probabilidad y estadística y las conecta con el comportamiento de las funciones hash: uniformidad, colisiones, integridad de datos y aplicaciones en seguridad. Incluye ejemplos en Python.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/9f86d0721e8cd2810e9e8b579f00722460ae4c7f/notebooks/es/Probabilidad_%2C_estad%C3%ADstica__Funciones_hash.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/machine-learning/blob/9f86d0721e8cd2810e9e8b579f00722460ae4c7f/notebooks/es/Probabilidad_%2C_estad%C3%ADstica__Funciones_hash.ipynb) |
+| **Entropía (Información e Incertidumbre)** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Recurso sobre entropía como medida de incertidumbre/información en distribuciones de probabilidad. Discute intuiciones, ejemplos numéricos y usos en machine learning, compresión y teoría de la información.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20HTML-en%20GitHub-orange?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/d390eeffc176bcad4853d5dc3a1f25cb4a2d774d/recursos/entropia.html) |
+
 
 ## **Fragmentos de Código Ilustrativos**
 
