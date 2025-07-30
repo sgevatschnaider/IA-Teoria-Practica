@@ -308,6 +308,29 @@ Esta sección agrupa notebooks diseñados para enseñar y reforzar conceptos cla
 |---|---|
 | **Problema de Fermi y la Sabiduría de Masas** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Este notebook explora el clásico "Problema de Fermi" y el concepto de sabiduría de masas, mostrando cómo las estimaciones colectivas pueden acercarse sorprendentemente a la realidad. Incluye teoría, ejemplos y aplicaciones en inteligencia colectiva y análisis de datos.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/IA-Teoria-Practica/blob/1d71e15637c6a3f2fa32698ab8bb420e5135ad3f/notebooks/Problema_de_Fermi_y_la_Sabidur%C3%ADa_de_masas.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/IA-Teoria-Practica/blob/1d71e15637c6a3f2fa32698ab8bb420e5135ad3f/notebooks/Problema_de_Fermi_y_la_Sabidur%C3%ADa_de_masas.ipynb) |
 
+### Distribuciones Discretas y Continuas
+
+| 📄 Recurso | 📥 Acceso |
+| :--- | :--- |
+| **Distribuciones Discretas y Continuas** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook dedicado al estudio de las distribuciones de probabilidad discretas y continuas, esenciales en estadística y machine learning. Incluye explicaciones teóricas, ejemplos prácticos, visualizaciones y casos de uso en la modelización y el análisis de datos.</p></details> | [![Ver Notebook](https://img.shields.io/badge/Ver%20Notebook-en%20GitHub-orange?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/a33017fcb85f0a2f4656518ce0db8eab7d072890/notebooks/es/Distribuciones_discretas_y_continuas.ipynb) |
+
+### Regresión Lineal, Outliers y Random Forest e Hiperparámetros 
+
+| 📄 Notebook | 📥 Acceso |
+| :--- | :--- |
+| **Regresión Lineal** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook enfocado en la regresión lineal, uno de los modelos fundamentales en estadística y machine learning. Incluye fundamentos teóricos, ejemplos prácticos, análisis de resultados y visualizaciones para comprender la relación entre variables.</p></details> | [![Ver Notebook](https://img.shields.io/badge/Ver%20Notebook-en%20GitHub-orange?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/8d5368e5d9e37830efe7641fc6642d5c9622b6b3/notebooks/es/Regresion_Lineal.ipynb) |
+| **Outliers** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook dedicado a la detección y análisis de outliers (valores atípicos) en conjuntos de datos. Presenta métodos estadísticos, ejemplos prácticos y visualizaciones para identificar, tratar e interpretar outliers en análisis de datos y modelos predictivos.</p></details> | [![Ver Notebook](https://img.shields.io/badge/Ver%20Notebook-en%20GitHub-orange?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/76504b3ca948a777ef8bb2eb77115a33add738b7/notebooks/es/Outliers.ipynb) |
+| **Random Forest e Hiperparámetros** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook dedicado a la técnica de Random Forest, un modelo de ensamble ampliamente utilizado en machine learning. Incluye teoría, ejemplos prácticos y estrategias para la selección de hiperparámetros.</p></details> | [![Ver Notebook](https://img.shields.io/badge/Ver%20Notebook-en%20GitHub-orange?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/64d5d3e366332b38952f444d5666c07d725302c5/notebooks/es/Random_forest_e_hiperpar%C3%A1metros_.ipynb) |
+
+| 📄 Recurso | Enlaces |
+|---|---|
+| **Sesgo, Varianza y Entropía** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook que explica los conceptos fundamentales de sesgo, varianza y entropía en el contexto de modelos de machine learning. Incluye ejemplos, visualizaciones y aplicaciones prácticas para comprender el equilibrio entre estos conceptos en la construcción de modelos predictivos.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/0d8037f01f56a159a530ab1e8c255d5433b2ee23/notebooks/es/Sesgo%2C_Varianza_y_entropia.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/machine-learning/blob/0d8037f01f56a159a530ab1e8c255d5433b2ee23/notebooks/es/Sesgo%2C_Varianza_y_entropia.ipynb) |
+
+| 📄 Recurso | Enlaces |
+|---|---|
+| **Bagging, Bootstrap y Random Forest** <br><br> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Notebook dedicado a los métodos de ensamblado Bagging y Random Forest. Explica la técnica del Bootstrap y cómo se utiliza para reducir la varianza y mejorar la robustez de los modelos. Incluye ejemplos prácticos y visualizaciones para entender el funcionamiento y las ventajas de estos algoritmos.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/machine-learning/blob/7e60e4ec2a19654c8ee6d6c38cc844bb3b598fb5/notebooks/es/Bagging_Boostrap_Random_Forest.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/machine-learning/blob/7e60e4ec2a19654c8ee6d6c38cc844bb3b598fb5/notebooks/es/Bagging_Boostrap_Random_Forest.ipynb) |
+
+
 
 
 ## **Fragmentos de Código Ilustrativos**
