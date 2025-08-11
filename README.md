@@ -29,10 +29,6 @@ Explorarás el vasto universo de la IA, incluyendo: **Aprendizaje Automático**,
 
 Esta carpeta contiene notebooks introductorios de Python y conceptos básicos necesarios para seguir los módulos posteriores.
 
-¡Excelente! He combinado la información nueva con la estructura que me proporcionaste.
-
-Aquí tienes el listado completo y organizado:
-
 ***
 
 # Módulo 00: Fundamentos y Herramientas
