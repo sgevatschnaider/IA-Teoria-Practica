@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Fold Cross Validation - Visualizador Interactivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #f8fafc;
+            --text-light: #e2e8f0;
+            --text-dark: #1e293b;
+            --border: #334155;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --train-color: #3b82f6;
+            --val-color: #f59e0b;
+            --test-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .control-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .value-display {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .visualization {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .viz-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status.ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status.running {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status.completed {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary);
+        }
+
+        .dataset-container {
+            margin-bottom: 2rem;
+        }
+
+        .dataset-label {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #94a3b8;
+        }
+
+        .dataset {
+            display: grid;
+            gap: 4px;
+            grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .data-point {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .data-point.train {
+            background: var(--train-color);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .data-point.val {
+            background: var(--val-color);
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+            transform: scale(1.1);
+        }
+
+        .data-point.inactive {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+
+        .fold-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .fold-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .fold-card.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .fold-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fold-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value.train {
+            color: var(--train-color);
+        }
+
+        .stat-value.val {
+            color: var(--val-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-container {
+            margin: 2rem 0;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .summary.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .summary-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .control-group {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .fold-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">K-Fold Cross Validation</h1>
+            <p class="subtitle">Visualización interactiva del proceso de validación cruzada para evaluar modelos de Machine Learning de forma robusta</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">Número de Folds (K):</label>
+                <div class="slider-container">
+                    <input type="range" id="kSlider" class="slider" min="3" max="10" value="5">
+                </div>
+                <div class="value-display" id="kValue">5</div>
+            </div>
+            
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    Iniciar Simulación
+                </button>
+                <button id="pauseBtn" class="btn btn-warning" disabled>
+                    <i class="fas fa-pause"></i>
+                    Pausar
+                </button>
+                <button id="resetBtn" class="btn btn-success">
+                    <i class="fas fa-refresh"></i>
+                    Reiniciar
+                </button>
+            </div>
+        </div>
+
+        <div class="visualization">
+            <div class="viz-header">
+                <h2 class="viz-title">Proceso de Validación</h2>
+                <div id="status" class="status ready">Listo para comenzar</div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--train-color)"></div>
+                    <span>Datos de Entrenamiento</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--val-color)"></div>
+                    <span>Datos de Validación</span>
+                </div>
+            </div>
+
+            <div class="dataset-container">
+                <div class="dataset-label">Dataset Completo (100 muestras)</div>
+                <div id="dataset" class="dataset"></div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>Progreso de la Simulación</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div id="foldInfo" class="fold-info"></div>
+        </div>
+
+        <div id="summary" class="summary">
+            <h3 class="summary-title">🎉 Simulación Completada</h3>
+            <div class="summary-stats" id="summaryStats"></div>
+        </div>
+    </div>
+
+    <script>
+        class KFoldVisualizer {
+            constructor() {
+                this.k = 5;
+                this.currentFold = 0;
+                this.isRunning = false;
+                this.isPaused = false;
+                this.dataSize = 100;
+                this.animationSpeed = 1500;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.createDataset();
+                this.updateFoldInfo();
+            }
+
+            initializeElements() {
+                this.kSlider = document.getElementById('kSlider');
+                this.kValue = document.getElementById('kValue');
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.status = document.getElementById('status');
+                this.dataset = document.getElementById('dataset');
+                this.foldInfo = document.getElementById('foldInfo');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.summary = document.getElementById('summary');
+                this.summaryStats = document.getElementById('summaryStats');
+            }
+
+            bindEvents() {
+                this.kSlider.addEventListener('input', (e) => {
+                    this.k = parseInt(e.target.value);
+                    this.kValue.textContent = this.k;
+                    this.reset();
+                });
+
+                this.startBtn.addEventListener('click', () => {
+                    if (!this.isRunning) {
+                        this.start();
+                    } else if (this.isPaused) {
+                        this.resume();
+                    }
+                });
+
+                this.pauseBtn.addEventListener('click', () => {
+                    this.pause();
+                });
+
+                this.resetBtn.addEventListener('click', () => {
+                    this.reset();
+                });
+            }
+
+            createDataset() {
+                this.dataset.innerHTML = '';
+                for (let i = 0; i < this.dataSize; i++) {
+                    const point = document.createElement('div');
+                    point.className = 'data-point train';
+                    point.dataset.index = i;
+                    this.dataset.appendChild(point);
+                }
+            }
+
+            updateFoldInfo() {
+                this.foldInfo.innerHTML = '';
+                for (let i = 0; i < this.k; i++) {
+                    const foldSize = Math.floor(this.dataSize / this.k);
+                    const trainSize = this.dataSize - foldSize;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'fold-card';
+                    card.innerHTML = `
+                        <div class="fold-title">
+                            <i class="fas fa-folder"></i>
+                            Fold ${i + 1}
+                        </div>
+                        <div class="fold-stats">
+                            <div class="stat">
+                                <div class="stat-value train">${trainSize}</div>
+                                <div class="stat-label">Entrenamiento</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value val">${foldSize}</div>
+                                <div class="stat-label">Validación</div>
+                            </div>
+                        </div>
+                    `;
+                    this.foldInfo.appendChild(card);
+                }
+            }
+
+            updateStatus(text, className) {
+                this.status.textContent = text;
+                this.status.className = `status ${className}`;
+            }
+
+            updateProgress() {
+                const progress = ((this.currentFold + 1) / this.k) * 100;
+                this.progressFill.style.width = `${progress}%`;
+                this.progressText.textContent = `${Math.round(progress)}%`;
+            }
+
+            getFoldIndices(foldIndex) {
+                const foldSize = Math.floor(this.dataSize / this.k);
+                const start = foldIndex * foldSize;
+                const end = foldIndex === this.k - 1 ? this.dataSize : start + foldSize;
+                return { start, end };
+            }
+
+            highlightCurrentFold() {
+                // Reset all data points
+                const points = this.dataset.querySelectorAll('.data-point');
+                points.forEach(point => {
+                    point.className = 'data-point train';
+                });
+
+                // Reset all fold cards
+                const cards = this.foldInfo.querySelectorAll('.fold-card');
+                cards.forEach(card => card.classList.remove('active'));
+
+                // Highlight current fold
+                const { start, end } = this.getFoldIndices(this.currentFold);
+                for (let i = start; i < end; i++) {
+                    points[i].className = 'data-point val';
+                }
+
+                // Activate current fold card
+                cards[this.currentFold].classList.add('active');
+
+                this.updateProgress();
+            }
+
+            async start() {
+                if (this.isPaused) {
+                    this.resume();
+                    return;
+                }
+
+                this.isRunning = true;
+                this.currentFold = 0;
+                this.startBtn.disabled = true;
+                this.pauseBtn.disabled = false;
+                this.updateStatus('Ejecutando simulación...', 'running');
+                this.summary.classList.remove('show');
+
+                await this.runSimulation();
+            }
+
+            async runSimulation() {
+                for (this.currentFold = 0; this.currentFold < this.k && this.isRunning; this.currentFold++) {
+                    if (this.isPaused) {
+                        return;
+                    }
+
+                    this.updateStatus(`Fold ${this.currentFold + 1}/${this.k} - Entrenando modelo...`, 'running');
+                    this.highlightCurrentFold();
+                    
+                    await this.sleep(this.animationSpeed);
+                }
+
+                if (this.isRunning && !this.isPaused) {
+                    this.complete();
+                }
+            }
+
+            pause() {
+                this.isPaused = true;
+                this.startBtn.disabled = false;
+                this.startBtn.innerHTML = '<i class="fas fa-play"></i> Continuar';
+                this.pauseBtn.disabled = true;
+                this.updateStatus('Simulación pausada', 'ready');
+            }
+
+            resume() {
+                this.isPaused = false;
+                this.startBtn.disabled = true;
+                this.startBtn.innerHTML = '<i class="fas fa-play"></i> Iniciar Simulación';
+                this.pauseBtn.disabled = false;
+                this.runSimulation();
+            }
+
+            complete() {
+                this.isRunning = false;
+                this.isPaused = false;
+                this.startBtn.disabled = false;
+                this.pauseBtn.disabled = true;
+                this.updateStatus('Simulación completada', 'completed');
+                
+                // Reset highlighting
+                const points = this.dataset.querySelectorAll('.data-point');
+                points.forEach(point => {
+                    point.className = 'data-point train';
+                });
+                
+                const cards = this.foldInfo.querySelectorAll('.fold-card');
+                cards.forEach(card => card.classList.remove('active'));
+
+                this.showSummary();
+            }
+
+            showSummary() {
+                const totalSamples = this.dataSize;
+                const avgFoldSize = Math.floor(totalSamples / this.k);
+                const totalModels = this.k;
+                
+                this.summaryStats.innerHTML = `
+                    <div class="stat">
+                        <div class="stat-value" style="color: var(--primary)">${totalModels}</div>
+                        <div class="stat-label">Modelos Entrenados</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" style="color: var(--success)">${totalSamples}</div>
+                        <div class="stat-label">Muestras Utilizadas</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" style="color: var(--warning)">${avgFoldSize}</div>
+                        <div class="stat-label">Validación por Fold</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" style="color: var(--primary)">${((totalSamples - avgFoldSize) / totalSamples * 100).toFixed(1)}%</div>
+                        <div class="stat-label">Datos para Entrenamiento</div>
+                    </div>
+                `;
+                
+                this.summary.classList.add('show');
+            }
+
+            reset() {
+                this.isRunning = false;
+                this.isPaused = false;
+                this.currentFold = 0;
+                this.startBtn.disabled = false;
+                this.startBtn.innerHTML = '<i class="fas fa-play"></i> Iniciar Simulación';
+                this.pauseBtn.disabled = true;
+                this.updateStatus('Listo para comenzar', 'ready');
+                
+                this.createDataset();
+                this.updateFoldInfo();
+                
+                this.progressFill.style.width = '0%';
+                this.progressText.textContent = '0%';
+                this.summary.classList.remove('show');
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Initialize the visualizer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new KFoldVisualizer();
+        });
+    </script>
+</body>
+</html>
