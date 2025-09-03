@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelos y Algoritmos de Machine Learning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: linear-gradient(135deg, #1d2b64 0%, #3a506b 100%);
+      --bg-secondary: rgba(255, 255, 255, 0.85);
+      --bg-tertiary: rgba(248, 250, 252, 0.8);
+      --text-primary: #2c3e50;
+      --text-secondary: #34495e;
+      --text-light: #ffffff;
+      --accent-primary: #3a506b;
+      --accent-secondary: #1d2b64;
+      --accent-gradient: linear-gradient(135deg, #4e6bad 0%, #6dd5ed 100%);
+      --border-color: rgba(226, 232, 240, 0.8);
+      --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.08);
+      --border-radius: 20px;
+      --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    [data-theme="dark"] {
+      --bg-primary: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      --bg-secondary: rgba(26, 32, 44, 0.85);
+      --bg-tertiary: rgba(45, 55, 72, 0.7);
+      --text-primary: #f7fafc;
+      --text-secondary: #a0aec0;
+      --accent-primary: #1dd1a1;
+      --accent-secondary: #48dbfb;
+      --border-color: rgba(255, 255, 255, 0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; line-height: 1.8; background: var(--bg-primary); color: var(--text-primary); transition: var(--transition); min-height: 100vh; position: relative; overflow-x: hidden; }
+    .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .particle { position: absolute; border-radius: 50%; animation: float 25s infinite linear; opacity: 0; background: rgba(255, 255, 255, 0.6);}
+    @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10%, 90% { opacity: 0.6; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }}
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 2rem; z-index: 1; }
+    .header { text-align: center; margin-bottom: 3rem; position: relative; }
+    .main-title { font-size: clamp(2.5rem, 5vw, 4.2rem); font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+
+    .theme-toggle { position: fixed; top: 2rem; right: 2rem; width: 60px; height: 60px; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-secondary); backdrop-filter: blur(15px); box-shadow: var(--shadow-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--accent-primary); transition: var(--transition); z-index: 1000; }
+    .theme-toggle:hover { transform: scale(1.15) rotate(180deg); }
+
+    .content-block {
+        background: var(--bg-secondary); backdrop-filter: blur(20px); border-radius: var(--border-radius);
+        box-shadow: var(--shadow-card); border: 2px solid var(--border-color);
+        padding: 2rem; margin-bottom: 2rem;
+    }
+    .content-block h2 { color: var(--text-primary); margin-bottom: 1rem; }
+    .content-block p { color: var(--text-secondary); margin-bottom: 1rem; }
+    .code-block { background-color: #2d2d2d; color: #f0f0f0; font-family: 'JetBrains Mono', monospace; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+
+    .lesson-container { display: flex; flex-direction: column; gap: 1.5rem; }
+    .topic-card { background: var(--bg-secondary); backdrop-filter: blur(20px); border-radius: var(--border-radius); box-shadow: var(--shadow-card); border: 2px solid var(--border-color); overflow: hidden; transition: var(--transition); }
+    .topic-header { cursor: pointer; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .topic-title { font-size: 1.3rem; font-weight: 600; color: var(--text-primary); }
+    .expand-icon { font-size: 1.2rem; color: var(--text-secondary); transition: var(--transition); }
+    .topic-card.open .expand-icon { transform: rotate(180deg); }
+    .topic-content { max-height: 0; overflow: hidden; transition: max-height 1.5s ease, padding 1.5s ease; background: var(--bg-tertiary); }
+    .topic-card.open .topic-content { max-height: 4000px; padding: 1.5rem 2rem; border-top: 1px solid var(--border-color); }
+
+    .topic-content h4 { color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; border-bottom: 2px solid var(--accent-primary); padding-bottom: 0.5rem; }
+    .topic-content p, .topic-content li { color: var(--text-secondary); line-height: 1.7; }
+    .topic-content ul, .topic-content ol { padding-left: 25px; margin-bottom: 1rem; }
+    .topic-content strong { color: var(--text-primary); font-weight: 700; }
+    .topic-content em { color: var(--text-primary); font-style: italic; }
+    .topic-content blockquote {
+        border-left: 4px solid var(--accent-primary); padding-left: 1.5rem; margin: 1.5rem 0;
+        font-style: italic; color: var(--text-secondary); background: rgba(127, 140, 141, 0.05);
+        border-radius: 0 8px 8px 0; padding: 1rem 1.5rem;
+    }
+    .table-container { overflow-x: auto; margin: 1.5rem 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 15px; border: 1px solid var(--border-color); text-align: left; }
+    thead th { background-color: var(--bg-tertiary); color: var(--text-primary); font-weight: 600; }
+    tbody tr:nth-child(even) { background: rgba(127, 140, 141, 0.05); }
+
+    footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+    footer p { color: var(--text-secondary); font-size: 0.9rem; opacity: 0.8; }
+
+    @media (max-width: 768px) {
+        .container { padding: 1rem; }
+        .topic-header { padding: 1rem 1.5rem; }
+        .topic-card.open .topic-content { padding: 1rem 1.5rem; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="particles" id="particles-container"></div>
+  <div class="theme-toggle" id="themeToggleButton" title="Cambiar tema"><i class="fas fa-moon" id="theme-icon"></i></div>
+  <div class="container">
+    <header class="header">
+      <h1 class="main-title">Modelos y Algoritmos de Machine Learning</h1>
+    </header>
+
+    <div class="lesson-container">
+        
+        <div class="topic-card">
+            <div class="topic-header">
+                <span class="topic-title">1. Introducción al Aprendizaje Automático</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="topic-content">
+                <h4>Inteligencia Artificial vs. Aprendizaje Automático</h4>
+                <p>Es crucial entender la jerarquía. La Inteligencia Artificial (IA) es el campo general de crear máquinas inteligentes, mientras que el Aprendizaje Automático (ML) es un <strong>subconjunto</strong> de la IA que se enfoca en algoritmos que aprenden de los datos.</p>
+                <div class="code-block">
+<pre><code>
+╔══════════════════════════════════╗
+║     Inteligencia Artificial      ║ (Concepto General: máquinas que imitan la inteligencia)
+╚══════════════════════════════════╝
+                 │
+                 ▼
+╔══════════════════════════════════╗
+║     Aprendizaje Automático       ║ (Subcampo: sistemas que aprenden de los datos)
+╚══════════════════════════════════╝
+                 │
+                 ▼
+╔══════════════════════════════════╗
+║          Deep Learning           ║ (Técnica de ML: redes neuronales profundas)
+╚══════════════════════════════════╝
+</code></pre>
+                </div>
+
+                <h4>Limpieza, Normalización y Análisis de Datos</h4>
+                <p>Este es el 80% del trabajo en un proyecto de ML. Un modelo es tan bueno como los datos con los que se entrena.</p>
+                <ol>
+                    <li><strong>Limpieza:</strong> Tratar valores nulos, duplicados y outliers.</li>
+                    <li><strong>Normalización:</strong> Escalar variables para que tengan un rango comparable (ej. 0 a 1).</li>
+                    <li><strong>Análisis Exploratorio (EDA):</strong> Visualizar datos para descubrir patrones iniciales.</li>
+                </ol>
+                <blockquote>"Basura entra, basura sale". La calidad del preprocesamiento de datos determina el éxito del modelo.</blockquote>
+                
+                <h4>Simulación de Preprocesamiento de Datos</h4>
+                <p>Veamos un ejemplo práctico de limpieza (imputación de nulos) y escalado con librerías de Python.</p>
+                <div class="code-block">
+<pre><code>import pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import MinMaxScaler
+
+# Datos con valores nulos y diferentes escalas
+data = {'edad': [25, 32, None, 45], 'salario': [50000, 80000, 60000, 120000]}
+df = pd.DataFrame(data)
+
+# 1. Limpieza: Imputar la edad faltante con la media
+imputer = SimpleImputer(strategy='mean')
+df['edad'] = imputer.fit_transform(df[['edad']])
+
+# 2. Normalización: Escalar el salario al rango [0, 1]
+scaler = MinMaxScaler()
+df['salario'] = scaler.fit_transform(df[['salario']])
+
+print(df)
+#    edad   salario
+# 0  25.0  0.000000
+# 1  32.0  0.428571
+# 2  34.0  0.142857  &lt;-- Edad imputada
+# 3  45.0  1.000000
+</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="topic-header">
+                <span class="topic-title">2. Principios del Aprendizaje Automático</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="topic-content">
+                <h4>Aprendizaje Supervisado y No Supervisado</h4>
+                <p>La principal división se basa en si los datos de entrenamiento tienen "respuestas" (etiquetas) o no.</p>
+                <div class="code-block">
+<pre><code>
+Diagrama Conceptual:
+
+SUPERVISADO (Datos Etiquetados)      NO SUPERVISADO (Datos sin Etiqueta)
+=================================      ===================================
+Dato             Etiqueta              Dato
+(edad, salario) -> compró? (Sí/No)     (gasto, frecuencia) -> ?
+(foto_perro)    -> 'perro'             (cliente_1)         -> ?
+(email_texto)   -> 'spam'              (cliente_2)         -> ?
+                                       
+Objetivo: Predecir la etiqueta.        Objetivo: Encontrar estructura (clusters).
+
+</code></pre>
+                </div>
+
+                <h4>Generalización y Sesgo Inductivo</h4>
+                <ul>
+                    <li><strong>Generalización:</strong> Es la meta final. Es la capacidad del modelo para hacer predicciones correctas sobre datos <strong>nuevos</strong>.</li>
+                    <li><strong>Sesgo Inductivo:</strong> Son las "suposiciones" que un algoritmo hace para poder generalizar. Un modelo lineal asume que la relación es una línea.</li>
+                </ul>
+
+                <h4>Principio de Parsimonia (Navaja de Ockham)</h4>
+                <blockquote>Entre dos modelos con un rendimiento similar, debemos elegir el <strong>más simple</strong>. Los modelos más simples tienden a generalizar mejor y son menos propensos al sobreajuste (overfitting).</blockquote>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="topic-header">
+                <span class="topic-title">3. Proceso de Trabajo con Algoritmos</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="topic-content">
+                <h4>El Ciclo de Vida de un Modelo de ML</h4>
+                <p>Trabajar con algoritmos de ML es un proceso iterativo, no lineal.</p>
+                <div class="code-block">
+<pre><code>
+┌───────────────────────────┐
+│ 1. Selección de Algoritmo │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐   ╭─────────── REITERAR ───────────╮
+│  2. Entrenamiento Modelo  │   │                                  │
+└─────────────┬─────────────┘   │
+              ▼                 │
+┌───────────────────────────┐   │
+│   3. Evaluación Calidad   │───╯
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│ 4. Ajuste Hiperparámetros │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│   5. Modelo Finalizado    │
+└─────────────┬─────────────┘
+              ▼
+┌───────────────────────────┐
+│       Despliegue          │
+└───────────────────────────┘
+</code></pre>
+                </div>
+                <h4>Simulación Mejorada del Proceso</h4>
+                 <div class="code-block">
+<pre><code>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# 1. Selección: Regresión Logística
+model = LogisticRegression()
+
+# 2. Entrenamiento
+# X, y serían tus datos cargados
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+model.fit(X_train, y_train)
+
+# 3. Evaluación Detallada
+predictions = model.predict(X_test)
+accuracy = accuracy_score(y_test, predictions)
+print(f"Precisión (Accuracy): {accuracy:.2f}\n")
+
+# Reporte con métricas más completas
+print("Reporte de Clasificación:")
+print(classification_report(y_test, predictions))
+</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="topic-header">
+                <span class="topic-title">4. Clasificación de Algoritmos</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="topic-content">
+                <h4>Mapa de Tipos de Algoritmos</h4>
+                <div class="code-block">
+<pre><code>
+Algoritmos de ML
+├── 1. Por Aplicación
+│   ├── Supervisado (con etiquetas)
+│   └── No Supervisado (sin etiquetas)
+│
+├── 2. Por Tarea
+│   ├── Clasificación (predecir categoría)
+│   ├── Regresión (predecir número)
+│   ├── Clustering (agrupar)
+│   └── Detección de Anomalías (identificar atípicos)
+│
+└── 3. Por Modelo Subyacente
+    ├── Generativo (aprende la distribución de datos)
+    └── Discriminativo (aprende la frontera entre clases)
+
+</code></pre>
+                </div>
+                <h4>Simulación: Clasificación, Regresión y Clustering en Python</h4>
+                <div class="code-block">
+<pre><code>from sklearn.svm import SVC
+from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
+
+# Tarea de CLASIFICACIÓN (Supervisado)
+# Predecir la especie de una flor a partir de sus medidas
+clf = SVC()
+clf.fit(medidas_flores_train, especie_flor_train)
+
+# Tarea de REGRESIÓN (Supervisado)
+# Predecir el salario a partir de años de experiencia
+reg = LinearRegression()
+reg.fit(años_experiencia_train, salario_train)
+
+# Tarea de CLUSTERING (No Supervisado)
+# Agrupar usuarios de una web en 3 grupos
+cluster_model = KMeans(n_clusters=3)
+cluster_model.fit(datos_usuarios)
+</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="topic-card">
+            <div class="topic-header">
+                <span class="topic-title">5. Ejemplos y Representaciones</span>
+                <i class="fas fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="topic-content">
+                <h4>Tabla Conceptual: Generativo vs. Discriminativo</h4>
+                <div class="table-container">
+                     <table>
+                        <thead><tr><th>Modelo</th><th>Objetivo</th><th>Pregunta que responde</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Generativo (&#36;P(X,Y)&#36;)</strong></td>
+                                <td>Aprende la probabilidad conjunta. Modela cómo se generan los datos.</td>
+                                <td>"¿Cuál es la probabilidad de que esté nublado <strong>y</strong> llueva?"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Discriminativo (&#36;P(Y|X)&#36;)</strong></td>
+                                <td>Aprende la probabilidad condicional. Modela la frontera de decisión.</td>
+                                <td>"<strong>Dado que</strong> está nublado, ¿cuál es la probabilidad de que llueva?"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h4>Ejemplo Numérico con Datos</h4>
+                <p>Supongamos que tenemos los siguientes 10 días de datos:</p>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Día</th><th>Nublado (X)</th><th>Llovió (Y)</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td>Sí (1)</td><td>Sí (1)</td></tr>
+                            <tr><td>2</td><td>Sí (1)</td><td>Sí (1)</td></tr>
+                            <tr><td>3</td><td>No (0)</td><td>No (0)</td></tr>
+                            <tr><td>4</td><td>Sí (1)</td><td>No (0)</td></tr>
+                            <tr><td>5</td><td>Sí (1)</td><td>Sí (1)</td></tr>
+                            <tr><td>6</td><td>No (0)</td><td>No (0)</td></tr>
+                            <tr><td>7</td><td>Sí (1)</td><td>Sí (1)</td></tr>
+                            <tr><td>8</td><td>No (0)</td><td>Sí (1)</td></tr>
+                            <tr><td>9</td><td>Sí (1)</td><td>No (0)</td></tr>
+                            <tr><td>10</td><td>No (0)</td><td>No (0)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p><strong>Un modelo Generativo</strong> aprendería la tabla de probabilidad conjunta (contando ocurrencias / total de 10 días):</p>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>P(Nublado, Llovió)</th><th>Llovió=Sí (1)</th><th>Llovió=No (0)</th><th>Total Fila</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Nublado=Sí (1)</strong></td><td>4/10 = 0.4</td><td>2/10 = 0.2</td><td>0.6</td></tr>
+                            <tr><td><strong>Nublado=No (0)</strong></td><td>1/10 = 0.1</td><td>3/10 = 0.3</td><td>0.4</td></tr>
+                            <tr><td><strong>Total Columna</strong></td><td>0.5</td><td>0.5</td><td>1.0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p><strong>Un modelo Discriminativo</strong> se enfocaría en la probabilidad condicional P(Llovió | Nublado):</p>
+                 <div class="table-container">
+                    <table>
+                        <thead><tr><th>P(Llovió | Nublado)</th><th>Llovió=Sí (1)</th><th>Llovió=No (0)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Dado Nublado=Sí (1)</strong></td><td>4/6 ≈ 0.67</td><td>2/6 ≈ 0.33</td></tr>
+                            <tr><td><strong>Dado Nublado=No (0)</strong></td><td>1/4 = 0.25</td><td>3/4 = 0.75</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <blockquote>El modelo discriminativo responde directamente: "Si está nublado, hay un 67% de probabilidad de lluvia". Es más directo para la predicción.</blockquote>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="content-block">
+        <h2>Conclusiones y Próximos Pasos</h2>
+        <p>Hemos recorrido el ciclo de vida completo de un proyecto de Machine Learning, desde los conceptos fundamentales hasta la aplicación práctica de sus algoritmos. La clave del éxito no reside en un solo modelo, sino en un proceso iterativo de preparación de datos, selección de algoritmos, entrenamiento riguroso y evaluación honesta.</p>
+        <p>Los modelos <strong>supervisados</strong> y <strong>no supervisados</strong>, así como los enfoques <strong>generativos</strong> y <strong>discriminativos</strong>, ofrecen un arsenal de herramientas para resolver una vasta gama de problemas. El siguiente paso es aplicar estos conocimientos en proyectos reales y experimentar con distintos algoritmos.</p>
+    </div>
+
+    <footer>
+      <p>Material elaborado por Sergo Gevatschnaider</p>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        const themeIcon = document.getElementById('theme-icon');
+        const bodyEl = document.body;
+
+        function setTheme(theme) {
+            bodyEl.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (themeIcon) { themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon'; }
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            const newTheme = (bodyEl.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        setTheme(localStorage.getItem('theme') || 'dark');
+
+        document.querySelectorAll('.topic-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const card = header.parentElement;
+                card.classList.toggle('open');
+            });
+        });
+
+        const container = document.getElementById('particles-container');
+        if (container) {
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + 'vw';
+                const size = (Math.random() * 5 + 2);
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.animationDelay = Math.random() * -20 + 's';
+                p.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        const firstTopic = document.querySelector('.topic-card');
+        if(firstTopic) {
+            firstTopic.classList.add('open');
+        }
+    })();
+  </script>
+</body>
+</html>
