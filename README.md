@@ -342,9 +342,6 @@ Esta sección agrupa notebooks diseñados para enseñar y reforzar conceptos cla
 | **Introducción a CUDA** <br/><br/> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Este notebook explora los fundamentos de CUDA, la plataforma de computación paralela de NVIDIA que permite acelerar significativamente el entrenamiento de modelos de Deep Learning utilizando GPUs.</p></details> | [![Ver en GitHub](https://img.shields.io/badge/Ver%20en-GitHub-blue?style=for-the-badge&logo=github)](https://github.com/sgevatschnaider/IA-Teoria-Practica/blob/6a3904cf6d9429fda7323dd4f383cc87fbfa4c83/notebooks/CUDA.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sgevatschnaider/IA-Teoria-Practica/blob/6a3904cf6d9429fda7323dd4f383cc87fbfa4c83/notebooks/CUDA.ipynb) |
 | **[EXTRA] Visualización Interactiva de Folds** <br/><br/> <details><summary><strong>Resumen:</strong> <em>(haz clic para expandir/colapsar)</em></summary><p>Un recurso interactivo para visualizar cómo se dividen los datos en 'folds' (pliegues) durante el proceso de validación cruzada. Ideal para reforzar la comprensión del concepto de una manera visual y práctica.</p></details> | [![Ver Página Web](https://img.shields.io/badge/Abrir%20Página-Interactiva-brightgreen?style=for-the-badge&logo=html5)](https://sgevatschnaider.github.io/IA-Teoria-Practica/recursos/fold.html) |
 
-¡Entendido! Utilizando el contenido de las diapositivas que me has mostrado, he creado el resumen para el enlace correspondiente.
-
-Aquí tienes el código Markdown:
 
 ##  Tipos de Algoritmos de Machine Learning
 
