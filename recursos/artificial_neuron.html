@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neurona Artificial — Prof. Sergio Gevataschnaider</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06091a;
+    --accent:  #18e8ff;
+    --accent2: #ff4d8a;
+    --accent3: #c060ff;
+    --green:   #39ff7a;
+    --gold:    #ffd44d;
+    --text:    #dff3ff;
+    --dim:     #5a80a8;
+    --card-bg: rgba(6,18,45,0.92);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    height: 100vh; width: 100vw;
+  }
+  #bg-canvas   { position:fixed; inset:0; z-index:0; }
+  #main-canvas { position:fixed; inset:0; z-index:1; }
+
+  /* Title bar */
+  #title-bar {
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    padding:16px 34px;
+    display:flex; align-items:center; gap:16px;
+    background:linear-gradient(to bottom,rgba(6,9,26,.96) 65%,transparent);
+    pointer-events:none;
+  }
+  #title-text {
+    font-family:'Orbitron',sans-serif;
+    font-size:clamp(15px,2.2vw,28px); font-weight:900;
+    letter-spacing:.2em; color:var(--accent);
+    text-shadow:0 0 24px var(--accent),0 0 50px rgba(24,232,255,.3);
+  }
+  #subtitle {
+    font-size:10px; letter-spacing:.28em; color:var(--dim);
+    text-transform:uppercase; margin-top:4px;
+  }
+  .badge {
+    font-family:'Orbitron',sans-serif; font-size:8px;
+    letter-spacing:.18em; border:1px solid var(--accent);
+    color:var(--accent); padding:4px 10px; border-radius:3px; opacity:.6;
+  }
+
+  /* Corners */
+  .corner { position:fixed; z-index:20; pointer-events:none; width:52px; height:52px; }
+  .corner svg { width:100%; height:100%; }
+  .c-tl{top:5px;left:5px;}
+  .c-tr{top:5px;right:5px;transform:scaleX(-1);}
+  .c-bl{bottom:5px;left:5px;transform:scaleY(-1);}
+  .c-br{bottom:5px;right:5px;transform:scale(-1);}
+
+  /* Panels */
+  #left-panel {
+    position:fixed; left:12px; top:50%; transform:translateY(-50%);
+    z-index:20; display:flex; flex-direction:column; gap:9px; pointer-events:none;
+  }
+  #right-panel {
+    position:fixed; right:12px; top:50%; transform:translateY(-50%);
+    z-index:20; display:flex; flex-direction:column; gap:9px;
+    align-items:flex-end; pointer-events:none;
+  }
+  .info-card {
+    background:var(--card-bg);
+    border:1px solid rgba(24,232,255,.15);
+    border-left:3px solid var(--accent);
+    padding:10px 14px; min-width:170px; max-width:210px;
+    backdrop-filter:blur(14px); border-radius:0 5px 5px 0;
+  }
+  #right-panel .info-card {
+    border-left:none; border-right:3px solid var(--accent3);
+    border-radius:5px 0 0 5px;
+  }
+  .card-label {
+    font-size:9px; letter-spacing:.26em; color:var(--dim);
+    text-transform:uppercase; margin-bottom:5px;
+  }
+  .card-value {
+    font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700;
+    color:var(--accent); text-shadow:0 0 12px var(--accent);
+  }
+  .cv-purple{color:var(--accent3);text-shadow:0 0 12px var(--accent3);}
+  .cv-pink  {color:var(--accent2);text-shadow:0 0 12px var(--accent2);}
+  .cv-gold  {color:var(--gold);   text-shadow:0 0 12px var(--gold);}
+  .cv-green {color:var(--green);  text-shadow:0 0 12px var(--green);}
+  .bar-wrap {
+    margin-top:6px; background:rgba(255,255,255,.05);
+    height:4px; border-radius:2px; overflow:hidden;
+  }
+  .bar-fill { height:100%; border-radius:2px; transition:width .5s ease; }
+
+  /* Bottom HUD */
+  #equation {
+    position:fixed; bottom:130px; left:50%; transform:translateX(-50%);
+    z-index:20; font-family:'Share Tech Mono',monospace;
+    font-size:clamp(10px,1.1vw,13px); color:var(--gold);
+    text-shadow:0 0 12px var(--gold); letter-spacing:.08em;
+    opacity:0; transition:opacity .5s; pointer-events:none; white-space:nowrap;
+  }
+  #phase-label {
+    position:fixed; bottom:106px; left:50%; transform:translateX(-50%);
+    z-index:20; font-family:'Orbitron',sans-serif;
+    font-size:clamp(10px,1.3vw,14px); letter-spacing:.2em;
+    color:var(--text); text-align:center;
+    text-shadow:0 0 16px rgba(24,232,255,.5);
+    pointer-events:none; white-space:nowrap;
+  }
+  #phase-bar {
+    position:fixed; bottom:86px; left:50%; transform:translateX(-50%);
+    z-index:20; display:flex; gap:14px; align-items:center; pointer-events:none;
+  }
+  .phase-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+    transition:all .4s ease;
+  }
+  .phase-dot.active {
+    background:var(--accent); box-shadow:0 0 12px var(--accent); transform:scale(1.4);
+  }
+
+  /* Buttons */
+  #btn-bar {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+    z-index:30; display:flex; gap:14px; align-items:center;
+  }
+  .btn {
+    font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase;
+    padding:10px 26px; border-radius:4px; cursor:pointer;
+    border:none; transition:all .22s ease; position:relative; overflow:hidden;
+  }
+  .btn:active{ transform:scale(.95); }
+  #btn-start {
+    background:linear-gradient(135deg,rgba(24,232,255,.12),rgba(24,232,255,.28));
+    border:1.5px solid var(--accent); color:var(--accent);
+    box-shadow:0 0 18px rgba(24,232,255,.28),inset 0 0 12px rgba(24,232,255,.05);
+    text-shadow:0 0 10px var(--accent);
+  }
+  #btn-start:hover {
+    box-shadow:0 0 32px rgba(24,232,255,.52),inset 0 0 18px rgba(24,232,255,.1);
+  }
+  #btn-reset {
+    background:linear-gradient(135deg,rgba(255,77,138,.12),rgba(255,77,138,.26));
+    border:1.5px solid var(--accent2); color:var(--accent2);
+    box-shadow:0 0 16px rgba(255,77,138,.22),inset 0 0 10px rgba(255,77,138,.04);
+    text-shadow:0 0 10px var(--accent2);
+  }
+  #btn-reset:hover {
+    box-shadow:0 0 30px rgba(255,77,138,.48),inset 0 0 16px rgba(255,77,138,.08);
+  }
+  #btn-status {
+    font-family:'Share Tech Mono',monospace; font-size:10px;
+    letter-spacing:.18em; color:var(--dim); min-width:90px; text-align:center;
+  }
+
+  /* Footer */
+  #footer {
+    position:fixed; bottom:7px; left:0; right:0; z-index:25;
+    text-align:center; pointer-events:none;
+    font-size:10px; letter-spacing:.2em; color:rgba(90,128,168,.7);
+    text-transform:uppercase;
+  }
+  #footer span { color:var(--accent); text-shadow:0 0 8px rgba(24,232,255,.35); }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="main-canvas"></canvas>
+
+<!-- Corners -->
+<div class="corner c-tl"><svg viewBox="0 0 52 52"><path d="M0 52L0 0L52 0" fill="none" stroke="#18e8ff" stroke-width="1.5" opacity=".5"/><path d="M0 34L0 0L34 0" fill="none" stroke="#18e8ff" stroke-width=".6" opacity=".3"/></svg></div>
+<div class="corner c-tr"><svg viewBox="0 0 52 52"><path d="M0 52L0 0L52 0" fill="none" stroke="#18e8ff" stroke-width="1.5" opacity=".5"/></svg></div>
+<div class="corner c-bl"><svg viewBox="0 0 52 52"><path d="M0 52L0 0L52 0" fill="none" stroke="#18e8ff" stroke-width="1.5" opacity=".5"/></svg></div>
+<div class="corner c-br"><svg viewBox="0 0 52 52"><path d="M0 52L0 0L52 0" fill="none" stroke="#18e8ff" stroke-width="1.5" opacity=".5"/></svg></div>
+
+<!-- Title -->
+<div id="title-bar">
+  <div>
+    <div id="title-text">NEURONA ARTIFICIAL</div>
+    <div id="subtitle">Modelo de Perceptrón · Visualización Dinámica</div>
+  </div>
+  <div class="badge">McCulloch-Pitts · 1943</div>
+</div>
+
+<!-- Left panel -->
+<div id="left-panel">
+  <div class="info-card">
+    <div class="card-label">Entradas activas (xᵢ)</div>
+    <div class="card-value" id="val-inputs">—</div>
+    <div class="bar-wrap"><div class="bar-fill" id="bar-inputs" style="width:0%;background:linear-gradient(90deg,#18e8ff,#39ff7a)"></div></div>
+  </div>
+  <div class="info-card">
+    <div class="card-label">Suma ponderada (Σ)</div>
+    <div class="card-value cv-purple" id="val-sum">—</div>
+    <div class="bar-wrap"><div class="bar-fill" id="bar-sum" style="width:0%;background:linear-gradient(90deg,#c060ff,#ff4d8a)"></div></div>
+  </div>
+  <div class="info-card">
+    <div class="card-label">Umbral / Bias (b)</div>
+    <div class="card-value cv-gold" id="val-bias">—</div>
+  </div>
+</div>
+
+<!-- Right panel -->
+<div id="right-panel">
+  <div class="info-card">
+    <div class="card-label">Función de activación</div>
+    <div class="card-value cv-purple" id="val-fn">—</div>
+  </div>
+  <div class="info-card">
+    <div class="card-label">Salida / Output (y)</div>
+    <div class="card-value cv-pink" id="val-out">—</div>
+    <div class="bar-wrap"><div class="bar-fill" id="bar-out" style="width:0%;background:linear-gradient(90deg,#ff4d8a,#ffd44d)"></div></div>
+  </div>
+  <div class="info-card">
+    <div class="card-label">Estado del sistema</div>
+    <div class="card-value cv-green" id="val-state" style="font-size:11px;letter-spacing:.06em">STANDBY</div>
+  </div>
+</div>
+
+<!-- Bottom HUD -->
+<div id="equation">y = σ( Σ wᵢxᵢ + b )</div>
+<div id="phase-label">— SISTEMA EN ESPERA —</div>
+<div id="phase-bar">
+  <div class="phase-dot" id="dot0"></div>
+  <div class="phase-dot" id="dot1"></div>
+  <div class="phase-dot" id="dot2"></div>
+  <div class="phase-dot" id="dot3"></div>
+  <div class="phase-dot" id="dot4"></div>
+</div>
+
+<!-- Buttons -->
+<div id="btn-bar">
+  <button class="btn" id="btn-start">▶ INICIAR</button>
+  <div id="btn-status">DETENIDO</div>
+  <button class="btn" id="btn-reset">↺ RESET</button>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+  Material elaborado por el profesor <span>Sergio Gevataschnaider</span>
+</div>
+
+<script>
+// ═══════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════
+const INPUTS_N = 5;
+const CYCLE_S  = 4.2;   // segundos por fase
+
+const C = {
+  accent : '#18e8ff',
+  accent2: '#ff4d8a',
+  accent3: '#c060ff',
+  green  : '#39ff7a',
+  gold   : '#ffd44d',
+  text   : '#dff3ff',
+  dim    : '#2a4a6a',
+};
+
+// ═══════════════════════════════════
+//  CANVAS
+// ═══════════════════════════════════
+const bgC  = document.getElementById('bg-canvas');
+const bgX  = bgC.getContext('2d');
+const cv   = document.getElementById('main-canvas');
+const ctx  = cv.getContext('2d');
+let W, H, cx, cy;
+
+function resize(){
+  W = window.innerWidth; H = window.innerHeight;
+  bgC.width = cv.width  = W;
+  bgC.height= cv.height = H;
+  cx = W/2; cy = H/2;
+  drawGrid();
+}
+resize();
+window.addEventListener('resize', resize);
+
+function drawGrid(){
+  bgX.clearRect(0,0,W,H);
+  const g = bgX.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.85);
+  g.addColorStop(0,'#0c1638');
+  g.addColorStop(1,'#040710');
+  bgX.fillStyle=g; bgX.fillRect(0,0,W,H);
+  bgX.strokeStyle='rgba(24,190,220,0.07)'; bgX.lineWidth=.5;
+  for(let x=0;x<W;x+=50){bgX.beginPath();bgX.moveTo(x,0);bgX.lineTo(x,H);bgX.stroke();}
+  for(let y=0;y<H;y+=50){bgX.beginPath();bgX.moveTo(0,y);bgX.lineTo(W,y);bgX.stroke();}
+  bgX.strokeStyle='rgba(24,232,255,0.025)';
+  for(let d=-W;d<W+H;d+=110){bgX.beginPath();bgX.moveTo(d,0);bgX.lineTo(d+H,H);bgX.stroke();}
+}
+
+// ═══════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════
+const lerp   = (a,b,t)=>a+(b-a)*t;
+const sig    = z=>1/(1+Math.exp(-z));
+const easeIO = t=>t<.5?2*t*t:-1+(4-2*t)*t;
+const rnd    = (a,b)=>a+Math.random()*(b-a);
+
+function ha(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function gLine(x1,y1,x2,y2,col,al,lw=1.5,bl=10){
+  ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=bl;
+  ctx.strokeStyle=ha(col,al); ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
+}
+function gCirc(x,y,r,col,al,fill=false,bl=14){
+  ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=bl;
+  if(fill){ctx.fillStyle=ha(col,al);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+  else{ctx.strokeStyle=ha(col,al);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();}
+  ctx.restore();
+}
+function rRect(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+// ═══════════════════════════════════
+//  LAYOUT
+// ═══════════════════════════════════
+function layout(){
+  const sc=Math.min(W,H)/900;
+  const somaR=56*sc, somaX=cx, somaY=cy;
+  const inX=cx-295*sc, outX=cx+305*sc;
+  const sp=268*sc;
+  const pts=Array.from({length:INPUTS_N},(_,i)=>({x:inX,y:cy-sp/2+(i+.5)/INPUTS_N*sp}));
+  return {somaR,somaX,somaY,inX,outX,pts};
+}
+
+// ═══════════════════════════════════
+//  STATE
+// ═══════════════════════════════════
+let running=false, phase=0, pTimer=0, aT=0;
+let inp=[], wts=[], bias=0, wsum=0, out=0;
+let pulses=[], parts=[], somaG=0, outR=0;
+
+const phNames=[
+  '— STANDBY: ESPERANDO SEÑALES —',
+  'FASE 1 · SEÑALES DE ENTRADA  (xᵢ)',
+  'FASE 2 · PONDERACIÓN DE PESOS (wᵢ)',
+  'FASE 3 · SUMA PONDERADA + BIAS (Σ)',
+  'FASE 4 · ACTIVACIÓN Y SALIDA  (y)'
+];
+const eqs=[
+  'y = σ( Σ wᵢxᵢ + b )',
+  'xᵢ ∈ [0.10 , 0.95]  →  señales de entrada',
+  'zᵢ = wᵢ · xᵢ  →  señal ponderada por peso',
+  'Σ = Σ wᵢxᵢ + b  →  suma total + umbral',
+  'y = σ(Σ) = 1 / (1 + e⁻ᶻ)  →  salida final'
+];
+
+function initCycle(){
+  inp  = Array.from({length:INPUTS_N},()=>+rnd(.1,.95).toFixed(2));
+  wts  = Array.from({length:INPUTS_N},()=>+rnd(-1,1).toFixed(2));
+  bias = +rnd(-.5,.5).toFixed(2);
+  wsum = inp.reduce((s,x,i)=>s+x*wts[i],0)+bias;
+  out  = sig(wsum);
+  pulses=[]; parts=[]; somaG=0; outR=0;
+}
+
+function setPhase(p){
+  phase=p; pTimer=0;
+  document.getElementById('phase-label').textContent=phNames[p];
+  const eq=document.getElementById('equation');
+  eq.style.opacity='0';
+  setTimeout(()=>{eq.textContent=eqs[p];eq.style.opacity='1';},280);
+  for(let i=0;i<5;i++) document.getElementById('dot'+i).classList.toggle('active',i===p);
+}
+
+// ═══════════════════════════════════
+//  BUTTONS
+// ═══════════════════════════════════
+const bStart=document.getElementById('btn-start');
+const bReset=document.getElementById('btn-reset');
+const bStat =document.getElementById('btn-status');
+
+bStart.addEventListener('click',()=>{
+  running=!running;
+  bStart.textContent=running?'⏸ PAUSAR':'▶ REANUDAR';
+  bStat.textContent =running?'EN EJECUCIÓN':'PAUSADO';
+  bStat.style.color =running?'var(--green)':'var(--dim)';
+});
+bReset.addEventListener('click',()=>{
+  running=false;
+  bStart.textContent='▶ INICIAR';
+  bStat.textContent='DETENIDO';
+  bStat.style.color='var(--dim)';
+  initCycle(); setPhase(0); updateUI();
+});
+
+// ═══════════════════════════════════
+//  PULSES & PARTICLES
+// ═══════════════════════════════════
+function pulse(x,y,tx,ty,col){ pulses.push({x,y,tx,ty,p:0,color:col}); }
+function emit(x,y,col,n=6){
+  for(let i=0;i<n;i++){
+    const a=rnd(0,Math.PI*2),s=rnd(1.5,4);
+    parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:col});
+  }
+}
+
+// ═══════════════════════════════════
+//  UI
+// ═══════════════════════════════════
+function updateUI(){
+  document.getElementById('val-inputs').textContent=phase>=1?INPUTS_N:'—';
+  document.getElementById('bar-inputs').style.width=phase>=1?'100%':'0%';
+  document.getElementById('val-sum').textContent=phase>=3?wsum.toFixed(3):'—';
+  document.getElementById('bar-sum').style.width=phase>=3?Math.min(100,Math.abs(wsum)*22)+'%':'0%';
+  document.getElementById('val-bias').textContent=phase>=3?bias.toFixed(2):'—';
+  document.getElementById('val-fn').textContent=phase>=4?'σ (Sigmoid)':'—';
+  document.getElementById('val-out').textContent=phase>=4?out.toFixed(4):'—';
+  document.getElementById('bar-out').style.width=phase>=4?(out*100).toFixed(1)+'%':'0%';
+  const st=['STANDBY','RECIBIENDO','PONDERANDO','CALCULANDO','✔ ACTIVADA'];
+  document.getElementById('val-state').textContent=st[phase]||'STANDBY';
+}
+
+// ═══════════════════════════════════
+//  DRAW
+// ═══════════════════════════════════
+function draw(){
+  requestAnimationFrame(draw);
+  const L=layout();
+  const {somaR,somaX,somaY,inX,outX,pts}=L;
+  ctx.clearRect(0,0,W,H);
+
+  aT+=.014;
+  if(running){
+    pTimer+=.016;
+    if(pTimer>CYCLE_S){ const nx=(phase+1)%5; if(nx===0)initCycle(); setPhase(nx); }
+  }
+
+  // ambient rings
+  for(let r=0;r<4;r++) gCirc(somaX,somaY,somaR*(2.7+r*1.5)+Math.sin(aT*.4+r)*5,C.accent3,.04*(4-r),false,6);
+
+  // dendrite lines
+  for(let i=0;i<INPUTS_N;i++){
+    const p=pts[i], w=wts[i]||0;
+    const col=w>=0?C.accent:C.accent2;
+    const tx=somaX-somaR*.85, ty=somaY+(p.y-somaY)*.28;
+    gLine(p.x,p.y,tx,ty,col,phase>=1?.28:.06,1,4);
+    if(phase>=2) gLine(p.x,p.y,tx,ty,col,.65*Math.abs(w),1+Math.abs(w)*4.5,18);
+  }
+
+  // axon
+  const axAl=phase>=4?.72:.11;
+  gLine(somaX+somaR*.85,somaY,outX,somaY,C.accent2,axAl,phase>=4?2.5:.7,14);
+  gLine(outX,somaY,outX+44,somaY-30,C.accent2,axAl*.5,1,7);
+  gLine(outX,somaY,outX+44,somaY+30,C.accent2,axAl*.5,1,7);
+  ctx.fillStyle=ha(C.dim,.6); ctx.font=`9px 'Share Tech Mono'`;
+  ctx.textAlign='center'; ctx.fillText('AXÓN',(somaX+outX)/2,somaY+28);
+
+  // input nodes
+  for(let i=0;i<INPUTS_N;i++){
+    const p=pts[i], v=inp[i]||0, w=wts[i]||0;
+    const col=(phase>=2&&w<0)?C.accent2:C.accent;
+    const act=phase>=1;
+    if(act){ const pu=(Math.sin(aT*2.2+i)+1)/2; gCirc(p.x,p.y,20+pu*6,col,.11,false,8); }
+    const nr=15;
+    const ng=ctx.createRadialGradient(p.x-3,p.y-3,0,p.x,p.y,nr);
+    ng.addColorStop(0,ha(col,act?.72:.28));
+    ng.addColorStop(1,ha(col,act?.05:.02));
+    ctx.save();
+    ctx.shadowColor=col; ctx.shadowBlur=act?22:5;
+    ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(p.x,p.y,nr,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=ha(col,act?.88:.28); ctx.lineWidth=1.5; ctx.stroke(); ctx.restore();
+    if(act){
+      ctx.fillStyle=ha(C.text,.96); ctx.font=`bold 10px 'Share Tech Mono'`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(v.toFixed(2),p.x,p.y);
+      ctx.fillStyle=ha(C.dim,.8); ctx.font=`9px 'Share Tech Mono'`;
+      ctx.textAlign='right'; ctx.fillText('x'+(i+1),p.x-18,p.y+24);
+      if(phase>=2){
+        const wx=p.x+62, wc=w>=0?C.accent:C.accent2;
+        ctx.save(); ctx.fillStyle=ha('#060e28',.93);
+        ctx.strokeStyle=ha(wc,.85); ctx.lineWidth=1;
+        rRect(wx-22,p.y-9,44,18,3); ctx.fill(); ctx.stroke();
+        ctx.fillStyle=ha(wc,1); ctx.font=`bold 10px 'Share Tech Mono'`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('w='+w.toFixed(2),wx,p.y); ctx.restore();
+      }
+    }
+  }
+
+  // soma
+  somaG=lerp(somaG,phase>=3?1:.28,.05);
+  for(let r=0;r<3;r++) gCirc(somaX,somaY,somaR+13+r*13+Math.sin(aT+r*.8)*5,C.accent3,.07*(3-r)*somaG,false,12);
+
+  const sg=ctx.createRadialGradient(somaX-somaR*.3,somaY-somaR*.3,0,somaX,somaY,somaR);
+  sg.addColorStop(0,ha(C.accent3,.65*somaG));
+  sg.addColorStop(.5,ha(C.accent,.17));
+  sg.addColorStop(1,ha(C.accent,.04));
+  ctx.save();
+  ctx.shadowColor=C.accent3; ctx.shadowBlur=44*somaG;
+  ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(somaX,somaY,somaR,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=ha(C.accent3,.72*somaG+.28); ctx.lineWidth=2; ctx.stroke();
+  ctx.strokeStyle=ha(C.accent,.22); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(somaX,somaY,somaR*.62,0,Math.PI*2); ctx.stroke(); ctx.restore();
+
+  ctx.fillStyle=ha(C.text,.96); ctx.font=`bold 12px 'Orbitron'`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('SOMA',somaX,somaY-10);
+  ctx.font=`9px 'Share Tech Mono'`; ctx.fillStyle=ha(C.dim,1);
+  ctx.fillText('∫ integración',somaX,somaY+6);
+  if(phase>=3){
+    ctx.fillStyle=ha(C.gold,.98); ctx.font=`bold 12px 'Share Tech Mono'`;
+    ctx.fillText('Σ='+wsum.toFixed(2),somaX,somaY+24);
+  }
+
+  ctx.fillStyle=ha(C.dim,.65); ctx.font=`9px 'Share Tech Mono'`; ctx.textAlign='center';
+  ctx.fillText('DENDRITAS',inX,cy-148);
+  ctx.fillText('NÚCLEO',somaX,somaY-somaR-22);
+
+  // output node
+  outR=lerp(outR,phase>=4?1:0,.06);
+  const op=(Math.sin(aT*3)+1)/2;
+  gCirc(outX,somaY,26+op*9*outR,C.accent2,.13*outR,false,22);
+  const og=ctx.createRadialGradient(outX-5,somaY-5,0,outX,somaY,26);
+  og.addColorStop(0,ha(C.accent2,.82*outR));
+  og.addColorStop(1,ha(C.accent2,.04));
+  ctx.save(); ctx.shadowColor=C.accent2; ctx.shadowBlur=30*outR;
+  ctx.fillStyle=og; ctx.beginPath(); ctx.arc(outX,somaY,26,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=ha(C.accent2,.88*outR+.12); ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(phase>=4){
+    ctx.fillStyle=ha(C.text,.97); ctx.font=`bold 12px 'Share Tech Mono'`;
+    ctx.fillText(out.toFixed(3),outX,somaY-7);
+    ctx.font=`9px 'Share Tech Mono'`; ctx.fillStyle=ha(C.accent2,.85);
+    ctx.fillText('OUTPUT',outX,somaY+10);
+  } else {
+    ctx.fillStyle=ha(C.dim,.45); ctx.font=`9px 'Orbitron'`;
+    ctx.fillText('OUTPUT',outX,somaY);
+  }
+
+  // auto pulses (only when running)
+  if(running){
+    if(phase===1&&Math.random()<.05){
+      const ri=Math.floor(Math.random()*INPUTS_N);
+      pulse(pts[ri].x+18,pts[ri].y,somaX-somaR,somaY+(pts[ri].y-somaY)*.28,C.accent);
+    }
+    if(phase===2&&Math.random()<.08){
+      const ri=Math.floor(Math.random()*INPUTS_N);
+      pulse(pts[ri].x+18,pts[ri].y,somaX-somaR,somaY+(pts[ri].y-somaY)*.28,wts[ri]>=0?C.accent:C.accent2);
+    }
+    if(phase===3&&Math.random()<.05) pulse(somaX+somaR,somaY,somaX+somaR*2,somaY,C.accent3);
+    if(phase===4&&Math.random()<.1)  pulse(somaX+somaR,somaY,outX-22,somaY,C.accent2);
+  }
+
+  // render pulses
+  pulses=pulses.filter(p=>p.p<1);
+  for(const p of pulses){
+    p.p+=.024;
+    const ep=easeIO(p.p);
+    const px=lerp(p.x,p.tx,ep), py=lerp(p.y,p.ty,ep);
+    const al=Math.sin(p.p*Math.PI)*.95;
+    ctx.save(); ctx.shadowColor=p.color; ctx.shadowBlur=16;
+    ctx.fillStyle=ha(p.color,al); ctx.beginPath(); ctx.arc(px,py,5.5,0,Math.PI*2); ctx.fill();
+    for(let t=1;t<=3;t++){
+      const ep2=easeIO(Math.max(0,p.p-t*.04));
+      ctx.fillStyle=ha(p.color,al*(3-t)/3*.32);
+      ctx.beginPath(); ctx.arc(lerp(p.x,p.tx,ep2),lerp(p.y,p.ty,ep2),3.5*(3-t)/3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    if(p.p>=.95) emit(p.tx,p.ty,p.color,6);
+  }
+
+  // render particles
+  parts=parts.filter(p=>p.life>.01);
+  for(const p of parts){
+    p.x+=p.vx; p.y+=p.vy; p.vx*=.91; p.vy*=.91; p.life*=.89;
+    ctx.save(); ctx.fillStyle=ha(p.color,p.life*.78);
+    ctx.shadowColor=p.color; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.2*p.life,0,Math.PI*2); ctx.fill(); ctx.restore();
+  }
+
+  updateUI();
+}
+
+// ═══════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════
+initCycle();
+setPhase(0);
+document.getElementById('equation').style.opacity='1';
+draw();
+</script>
+</body>
+</html>
